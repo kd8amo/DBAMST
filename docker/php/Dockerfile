@@ -1,0 +1,41 @@
+FROM php:8.3-fpm
+
+# System dependencies needed to build common PHP extensions
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpq-dev \
+    libzip-dev \
+    libpng-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libonig-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# PHP extensions required by Laravel + this project
+# pdo_pgsql / pgsql -> PostgreSQL
+# gd                -> barcode/label image generation
+# zip               -> Excel import/export (PhpSpreadsheet)
+# bcmath / intl     -> common Laravel requirements
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
+        pdo_pgsql \
+        pgsql \
+        gd \
+        zip \
+        bcmath \
+        intl \
+        opcache
+
+# Composer (PHP package manager)
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+
+# Recommended production-leaning opcache settings; safe for dev too
+COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache-custom.ini
+COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-custom.ini
+
+EXPOSE 9000
+
+CMD ["php-fpm"]
