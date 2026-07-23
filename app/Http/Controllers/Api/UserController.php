@@ -63,7 +63,7 @@ class UserController extends Controller
         $user = User::create([
             'name'       => $validated['name'],
             'email'      => $validated['email'],
-            'password'   => Hash::make($validated['password']),
+	    'password_hash' => Hash::make($validated['password']),
             'role_id'    => $validated['role_id'],
             'locale'     => $validated['locale'] ?? 'en',
             'is_active'  => true,
@@ -147,10 +147,10 @@ class UserController extends Controller
         ]);
 
         if (! empty($validated['password'])) {
-            if (! Hash::check($validated['current_password'], $user->password)) {
+            if (! Hash::check($validated['current_password'], $user->password_hash)) {
                 return response()->json(['error' => 'Current password is incorrect.'], 422);
             }
-            $user->update(['password' => Hash::make($validated['password'])]);
+            $user->update(['password_hash' => Hash::make($validated['password'])]);
         }
 
         if (! empty($validated['locale'])) {
@@ -172,7 +172,7 @@ class UserController extends Controller
 
         $user = User::where('email', $validated['email'])->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password_hash)) {
             return response()->json(['error' => 'Invalid credentials.'], 401);
         }
 
