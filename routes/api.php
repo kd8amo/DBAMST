@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\DeviceController;
+use App\Http\Controllers\Api\FaultReportController;
+use App\Http\Controllers\Api\MaintenanceController;
 use App\Http\Controllers\Api\SiteController;
 use App\Http\Controllers\Api\TestSystemController;
 use Illuminate\Support\Facades\Route;
@@ -36,25 +39,65 @@ Route::middleware('auth:sanctum')->group(function () {
     // Devices (UC-1 through UC-12)
     // -------------------------------------------------------------------------
     Route::prefix('devices')->group(function () {
-        Route::get('/',                          [DeviceController::class, 'index']);
-        Route::post('/',                         [DeviceController::class, 'store']);
-        Route::get('/find-by-asset-tag',         [DeviceController::class, 'findByAssetTag']);
-        Route::get('/{device}',                  [DeviceController::class, 'show']);
-        Route::patch('/{device}',                [DeviceController::class, 'update']);
-        Route::post('/{device}/retire',          [DeviceController::class, 'retire']);
-        Route::post('/{device}/transfer',        [DeviceController::class, 'transfer']);
+        Route::get('/',                      [DeviceController::class, 'index']);
+        Route::post('/',                     [DeviceController::class, 'store']);
+        Route::get('/find-by-asset-tag',     [DeviceController::class, 'findByAssetTag']);
+        Route::get('/{device}',              [DeviceController::class, 'show']);
+        Route::patch('/{device}',            [DeviceController::class, 'update']);
+        Route::post('/{device}/retire',      [DeviceController::class, 'retire']);
+        Route::post('/{device}/transfer',    [DeviceController::class, 'transfer']);
+        Route::post('/{device}/out-for-cal', [MaintenanceController::class, 'markOutForCalibration']);
     });
 
     // -------------------------------------------------------------------------
     // Test Systems (UC-5 through UC-9)
     // -------------------------------------------------------------------------
     Route::prefix('test-systems')->group(function () {
-        Route::get('/',                                          [TestSystemController::class, 'index']);
-        Route::post('/',                                         [TestSystemController::class, 'store']);
-        Route::get('/{testSystem}',                              [TestSystemController::class, 'show']);
-        Route::patch('/{testSystem}',                            [TestSystemController::class, 'update']);
-        Route::post('/{testSystem}/assign-device',               [TestSystemController::class, 'assignDevice']);
-        Route::delete('/{testSystem}/devices/{device}',          [TestSystemController::class, 'unassignDevice']);
+        Route::get('/',                                 [TestSystemController::class, 'index']);
+        Route::post('/',                                [TestSystemController::class, 'store']);
+        Route::get('/{testSystem}',                     [TestSystemController::class, 'show']);
+        Route::patch('/{testSystem}',                   [TestSystemController::class, 'update']);
+        Route::post('/{testSystem}/assign-device',      [TestSystemController::class, 'assignDevice']);
+        Route::delete('/{testSystem}/devices/{device}', [TestSystemController::class, 'unassignDevice']);
+    });
+
+    // -------------------------------------------------------------------------
+    // Bookings (UC-21 through UC-25)
+    // -------------------------------------------------------------------------
+    Route::prefix('bookings')->group(function () {
+        Route::get('/',                      [BookingController::class, 'index']);
+        Route::post('/',                     [BookingController::class, 'store']);
+        Route::get('/{booking}',             [BookingController::class, 'show']);
+        Route::patch('/{booking}',           [BookingController::class, 'update']);
+        Route::post('/{booking}/cancel',     [BookingController::class, 'cancel']);
+        Route::post('/{booking}/confirm',    [BookingController::class, 'confirm']);
+    });
+
+    // -------------------------------------------------------------------------
+    // Fault Reports (UC-18 through UC-19)
+    // -------------------------------------------------------------------------
+    Route::prefix('fault-reports')->group(function () {
+        Route::get('/',                  [FaultReportController::class, 'index']);
+        Route::post('/',                 [FaultReportController::class, 'store']);
+        Route::get('/{faultReport}',     [FaultReportController::class, 'show']);
+        Route::patch('/{faultReport}',   [FaultReportController::class, 'update']);
+    });
+
+    // -------------------------------------------------------------------------
+    // Maintenance — Schedules (UC-13) and Events (UC-14 through UC-17)
+    // -------------------------------------------------------------------------
+    Route::prefix('maintenance')->group(function () {
+        // Due/overdue list (UC-20)
+        Route::get('/due',                   [MaintenanceController::class, 'dueList']);
+
+        // Schedules
+        Route::get('/schedules',             [MaintenanceController::class, 'indexSchedules']);
+        Route::post('/schedules',            [MaintenanceController::class, 'storeSchedule']);
+        Route::patch('/schedules/{schedule}',[MaintenanceController::class, 'updateSchedule']);
+
+        // Events (calibration, PM, repair logs)
+        Route::get('/events',                [MaintenanceController::class, 'indexEvents']);
+        Route::post('/events',               [MaintenanceController::class, 'storeEvent']);
     });
 
 });
