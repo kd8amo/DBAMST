@@ -30,6 +30,9 @@ class DatabaseSeeder extends Seeder
 
             // Application configuration
             SystemSettingSeeder::class,
+
+            // Default admin user — change password after first login!
+            AdminUserSeeder::class,
         ]);
     }
 }

@@ -60,15 +60,24 @@ class UserController extends Controller
             'locale'   => ['nullable', 'string', 'max:10'],
         ]);
 
-        $user = User::create([
-            'name'       => $validated['name'],
-            'email'      => $validated['email'],
+	$user = User::create([
+	    'name'       => $validated['name'],
+	    'display_name' => $validated['display_name'] ?? $validated['name'],
+	    'email'      => $validated['email'],
 	    'password_hash' => Hash::make($validated['password']),
-            'role_id'    => $validated['role_id'],
-            'locale'     => $validated['locale'] ?? 'en',
-            'is_active'  => true,
-            'created_by' => $request->user()->id,
-        ]);
+	    'role_id'    => $validated['role_id'],
+	    'locale'     => $validated['locale'] ?? 'en',
+	    'is_active'  => true,
+	    'created_by' => $request->user()->id,
+	]);
+
+	// Sync role into user_roles pivot table so canActAs() works correctly.
+	DB::table('user_roles')->insert([
+	    'user_id' => $user->id,
+	    'role_id' => $validated['role_id'],
+	]);
+
+
 
         AuditLog::recordForUser(
             $request->user(),
