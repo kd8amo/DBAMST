@@ -45,6 +45,28 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // -------------------------------------------------------------------------
+    // Lookup tables (read-only, all authenticated users)
+    // -------------------------------------------------------------------------
+    Route::get('/device-categories', fn () => response()->json(
+        \App\Models\DeviceCategory::orderBy('name')->get()
+    ));
+    Route::get('/device-statuses', fn () => response()->json(
+        \App\Models\DeviceStatus::orderBy('name')->get()
+    ));
+    Route::get('/test-system-statuses', fn () => response()->json(
+        \App\Models\TestSystemStatus::orderBy('name')->get()
+    ));
+    Route::get('/fault-report-statuses', fn () => response()->json(
+        \App\Models\FaultReportStatus::orderBy('name')->get()
+    ));
+    Route::get('/maintenance-event-types', fn () => response()->json(
+        \App\Models\MaintenanceEventType::orderBy('name')->get()
+    ));
+    Route::get('/roles', fn () => response()->json(
+        \App\Models\Role::orderBy('name')->get()
+    ));
+
+    // -------------------------------------------------------------------------
     // Devices (UC-1 through UC-12)
     // -------------------------------------------------------------------------
     Route::prefix('devices')->group(function () {
