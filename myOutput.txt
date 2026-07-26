@@ -1,0 +1,70 @@
+
+> build
+> vite build
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 312 modules transformed.
+✗ Build failed in 887ms
+error during build:
+Build failed with 11 errors:
+
+[plugin vite:vue] /home/daniel/DBAMST/resources/js/views/admin/ApiKeyListView.vue
+RolldownError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/admin/ApiKeyListView.vue
+SyntaxError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/admin/ApiKeyListView.vue
+    at Object.parse$1 [as parse] (/home/daniel/DBAMST/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1894:7)
+    at createDescriptor (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:50:42)
+    at transformMain (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1352:33)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1763:27)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33304:13)
+    at plugin (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1511:30)
+    at plugin.<computed> (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+[plugin vite:vue] /home/daniel/DBAMST/resources/js/views/sites/SiteListView.vue
+RolldownError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/sites/SiteListView.vue
+SyntaxError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/sites/SiteListView.vue
+    at Object.parse$1 [as parse] (/home/daniel/DBAMST/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1894:7)
+    at createDescriptor (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:50:42)
+    at transformMain (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1352:33)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1763:27)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33304:13)
+    at plugin (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1511:30)
+    at plugin.<computed> (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+[plugin vite:vue] /home/daniel/DBAMST/resources/js/views/systems/TestSystemDetailView.vue
+RolldownError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/systems/TestSystemDetailView.vue
+SyntaxError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/systems/TestSystemDetailView.vue
+    at Object.parse$1 [as parse] (/home/daniel/DBAMST/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1894:7)
+    at createDescriptor (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:50:42)
+    at transformMain (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1352:33)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1763:27)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33304:13)
+    at plugin (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1511:30)
+    at plugin.<computed> (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+[plugin vite:vue] /home/daniel/DBAMST/resources/js/views/bookings/BookingCalendarView.vue
+RolldownError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/bookings/BookingCalendarView.vue
+SyntaxError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/bookings/BookingCalendarView.vue
+    at Object.parse$1 [as parse] (/home/daniel/DBAMST/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1894:7)
+    at createDescriptor (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:50:42)
+    at transformMain (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1352:33)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1763:27)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33304:13)
+    at plugin (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1511:30)
+    at plugin.<computed> (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+[plugin vite:vue] /home/daniel/DBAMST/resources/js/views/faults/FaultReportListView.vue
+RolldownError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/faults/FaultReportListView.vue
+SyntaxError: At least one <template> or <script> is required in a single file component. /home/daniel/DBAMST/resources/js/views/faults/FaultReportListView.vue
+    at Object.parse$1 [as parse] (/home/daniel/DBAMST/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1894:7)
+    at createDescriptor (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:50:42)
+    at transformMain (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1352:33)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/@vitejs/plugin-vue/dist/index.mjs:1763:27)
+    at TransformPluginContextImpl.handler (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33304:13)
+    at plugin (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1511:30)
+    at plugin.<computed> (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/bindingify-input-options-XPJLJOD0.mjs:1959:18)
+...
+    at aggregateBindingErrorsIntoJsError (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    at unwrapBindingResult (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    at #build (file:///home/daniel/DBAMST/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    at async buildEnvironment (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33061:66)
+    at async Object.build (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33483:19)
+    at async Object.buildApp (file:///home/daniel/DBAMST/node_modules/vite/dist/node/chunks/node.js:33480:153)
+    at async CAC.<anonymous> (file:///home/daniel/DBAMST/node_modules/vite/dist/node/cli.js:776:3) {
+  errors: [Getter/Setter]
+}
