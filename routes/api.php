@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Route;
 // Health check — unauthenticated, used by monitoring/load balancers.
 Route::get('/health', fn () => response()->json(['status' => 'ok']));
 
+Route::middleware('auth:sanctum')->get('/dashboard', [App\Http\Controllers\Api\DashboardController::class, 'summary']);
+
 // Authentication — unauthenticated.
 Route::post('/login',  [UserController::class, 'login']);
 
