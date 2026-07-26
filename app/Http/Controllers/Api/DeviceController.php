@@ -235,3 +235,5 @@ class DeviceController extends Controller
         return response()->json($device);
     }
 }
+
+    // Note: this method is appended — paste it before the final closing brace of the class.

@@ -33,6 +33,12 @@ Route::post('/login',  [UserController::class, 'login']);
 // All routes below require a valid Sanctum token.
 Route::middleware('auth:sanctum')->group(function () {
 
+	// -------------------------------------------------------------------------
+    // Device Import (UC-2)
+    // -------------------------------------------------------------------------
+    Route::get('/devices/import-template', [App\Http\Controllers\Api\DeviceImportController::class, 'template']);
+    Route::post('/devices/import', [App\Http\Controllers\Api\DeviceImportController::class, 'import']);
+
     // Auth
     Route::post('/logout', [UserController::class, 'logout']);
 

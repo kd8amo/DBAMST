@@ -136,6 +136,58 @@
             </div>
         </div>
     </div>
+    <!-- Import Modal -->
+        <div v-if="showImportModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-xl p-6 w-full max-w-lg shadow-xl">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Bulk Import Devices</h3>
+
+                <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+                    <p class="font-medium mb-1">Instructions:</p>
+                    <ol class="list-decimal list-inside space-y-1">
+                        <li>Download the CSV template below</li>
+                        <li>Fill in your devices (one per row)</li>
+                        <li>Upload the completed file</li>
+                    </ol>
+                    <a href="/api/devices/import-template"
+                        class="inline-block mt-2 text-blue-600 hover:text-blue-800 font-medium">
+                        ↓ Download CSV Template
+                    </a>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
+                    <input type="file" accept=".csv" @change="handleFileSelect"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none" />
+                </div>
+
+                <!-- Import results -->
+                <div v-if="importResults" class="mb-4">
+                    <div class="flex gap-4 mb-3 text-sm font-medium">
+                        <span class="text-green-600">✓ {{ importResults.succeeded }} succeeded</span>
+                        <span class="text-red-600">✗ {{ importResults.failed }} failed</span>
+                        <span class="text-gray-600">{{ importResults.total }} total</span>
+                    </div>
+                    <div v-if="importResults.failed > 0" class="max-h-48 overflow-y-auto">
+                        <div v-for="row in importResults.rows.filter(r => r.status === 'failed')" :key="row.row"
+                            class="mb-2 p-2 bg-red-50 border border-red-200 rounded text-xs">
+                            <p class="font-medium text-red-700">Row {{ row.row }}: {{ row.data.manufacturer }} {{ row.data.model }}</p>
+                            <p v-for="err in row.errors" :key="err" class="text-red-600">{{ err }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="importError" class="mb-3 text-red-600 text-sm">{{ importError }}</div>
+
+                <div class="flex gap-3 justify-end">
+                    <button @click="showImportModal = false; importResults = null; importError = null"
+                        class="px-4 py-2 border rounded-lg hover:bg-gray-50">Close</button>
+                    <button v-if="importFile" @click="submitImport" :disabled="importing"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400">
+                        {{ importing ? 'Importing...' : 'Import' }}
+                    </button>
+                </div>
+            </div>
+        </div>
 </template>
 
 <script setup>
@@ -155,6 +207,36 @@ const loading    = ref(false)
 
 const showCreateModal = ref(false)
 const showImportModal = ref(false)
+
+const importFile    = ref(null)
+const importResults = ref(null)
+const importError   = ref(null)
+const importing     = ref(false)
+
+function handleFileSelect(event) {
+    importFile.value    = event.target.files[0]
+    importResults.value = null
+    importError.value   = null
+}
+
+async function submitImport() {
+    if (!importFile.value) return
+    importing.value = true
+    importError.value = null
+    try {
+        const formData = new FormData()
+        formData.append('file', importFile.value)
+        const response = await api.post('/devices/import', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        importResults.value = response.data
+        await fetchDevices()
+    } catch (e) {
+        importError.value = e.response?.data?.message ?? 'Import failed.'
+    } finally {
+        importing.value = false
+    }
+}
 
 const filters = ref({
     search:      '',
