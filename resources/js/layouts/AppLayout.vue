@@ -12,7 +12,6 @@
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                     active-class="bg-gray-700 text-white"
                 >
-                    <i :class="item.icon" />
                     <span>{{ $t(item.label) }}</span>
                 </RouterLink>
             </nav>
@@ -23,15 +22,14 @@
                 </div>
                 <button
                     @click="handleLogout"
-                    class="w-full text-left px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors flex items-center gap-3"
+                    class="w-full text-left px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
                 >
-                    <i class="pi pi-sign-out" />
-                    <span>{{ $t('nav.logout') }}</span>
+                    {{ $t('nav.logout') }}
                 </button>
             </div>
         </aside>
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white border-b px-6 py-3 flex items-center justify-between">
+            <header class="bg-white border-b px-6 py-3">
                 <h2 class="text-gray-700 font-medium">{{ pageTitle }}</h2>
             </header>
             <div class="flex-1 overflow-auto p-6">
@@ -51,16 +49,16 @@ const router = useRouter()
 const auth   = useAuthStore()
 
 const navItems = [
-    { name: 'dashboard',     to: '/',              label: 'nav.dashboard',    icon: 'pi pi-home' },
-    { name: 'devices',       to: '/devices',       label: 'nav.devices',      icon: 'pi pi-microchip' },
-    { name: 'test-systems',  to: '/test-systems',  label: 'nav.testSystems',  icon: 'pi pi-server' },
-    { name: 'bookings',      to: '/bookings',      label: 'nav.bookings',     icon: 'pi pi-calendar' },
-    { name: 'fault-reports', to: '/fault-reports', label: 'nav.faultReports', icon: 'pi pi-exclamation-triangle' },
-    { name: 'maintenance',   to: '/maintenance',   label: 'nav.maintenance',  icon: 'pi pi-wrench' },
-    { name: 'audit-log',     to: '/audit-log',     label: 'nav.auditLog',     icon: 'pi pi-list' },
-    { name: 'users',         to: '/users',         label: 'nav.users',        icon: 'pi pi-users',      adminOnly: true },
-    { name: 'api-keys',      to: '/api-keys',      label: 'nav.apiKeys',      icon: 'pi pi-key',        adminOnly: true },
-    { name: 'sites',         to: '/sites',         label: 'nav.sites',        icon: 'pi pi-map-marker', adminOnly: true },
+    { name: 'dashboard',     to: '/',              label: 'nav.dashboard'    },
+    { name: 'devices',       to: '/devices',       label: 'nav.devices'      },
+    { name: 'test-systems',  to: '/test-systems',  label: 'nav.testSystems'  },
+    { name: 'bookings',      to: '/bookings',      label: 'nav.bookings'     },
+    { name: 'fault-reports', to: '/fault-reports', label: 'nav.faultReports' },
+    { name: 'maintenance',   to: '/maintenance',   label: 'nav.maintenance'  },
+    { name: 'audit-log',     to: '/audit-log',     label: 'nav.auditLog'     },
+    { name: 'users',         to: '/users',         label: 'nav.users',       adminOnly: true },
+    { name: 'api-keys',      to: '/api-keys',      label: 'nav.apiKeys',     adminOnly: true },
+    { name: 'sites',         to: '/sites',         label: 'nav.sites',       adminOnly: true },
 ].filter(item => !item.adminOnly || auth.isAdmin)
 
 const pageTitle = computed(() => route.name ?? '')
