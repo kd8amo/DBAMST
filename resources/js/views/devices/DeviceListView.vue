@@ -5,6 +5,20 @@
             <h2 class="text-2xl font-bold text-gray-800">{{ $t('nav.devices') }}</h2>
             <div class="flex gap-2">
                 <button
+                    v-if="selectedIds.length > 0"
+                    @click="printLabels('avery')"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                    Print Labels (Avery)
+                </button>
+                <button
+                    v-if="selectedIds.length > 0"
+                    @click="printLabels('thermal')"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                    Print Labels (Thermal)
+                </button>
+                <button
                     v-if="auth.canWrite"
                     @click="showImportModal = true"
                     class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
@@ -58,15 +72,14 @@
 
         <!-- Table -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div v-if="loading" class="p-8 text-center text-gray-500">
-                {{ $t('common.loading') }}
-            </div>
-            <div v-else-if="devices.length === 0" class="p-8 text-center text-gray-500">
-                {{ $t('common.noData') }}
-            </div>
+            <div v-if="loading" class="p-8 text-center text-gray-500">{{ $t('common.loading') }}</div>
+            <div v-else-if="devices.length === 0" class="p-8 text-center text-gray-500">{{ $t('common.noData') }}</div>
             <table v-else class="w-full">
                 <thead class="bg-gray-50 border-b">
                     <tr>
+                        <th class="px-4 py-3">
+                            <input type="checkbox" v-model="allSelected" @change="toggleAll" class="rounded" />
+                        </th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset Tag</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Manufacturer / Model</th>
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
@@ -82,6 +95,9 @@
                         :key="device.id"
                         class="hover:bg-gray-50 transition-colors"
                     >
+                        <td class="px-4 py-3">
+                            <input type="checkbox" :value="device.id" v-model="selectedIds" class="rounded" />
+                        </td>
                         <td class="px-4 py-3 font-mono text-sm font-medium text-blue-600">
                             {{ device.asset_tag }}
                         </td>
@@ -116,7 +132,10 @@
 
             <!-- Pagination -->
             <div v-if="pagination" class="px-4 py-3 border-t flex items-center justify-between text-sm text-gray-600">
-                <span>Showing {{ pagination.from }}–{{ pagination.to }} of {{ pagination.total }}</span>
+                <span>
+                    Showing {{ pagination.from }}–{{ pagination.to }} of {{ pagination.total }}
+                    <span v-if="selectedIds.length > 0" class="ml-2 text-blue-600">({{ selectedIds.length }} selected)</span>
+                </span>
                 <div class="flex gap-2">
                     <button
                         :disabled="!pagination.prev_page_url"
@@ -135,12 +154,11 @@
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Import Modal -->
+
+        <!-- Import Modal -->
         <div v-if="showImportModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div class="bg-white rounded-xl p-6 w-full max-w-lg shadow-xl">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">Bulk Import Devices</h3>
-
                 <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
                     <p class="font-medium mb-1">Instructions:</p>
                     <ol class="list-decimal list-inside space-y-1">
@@ -153,14 +171,11 @@
                         ↓ Download CSV Template
                     </a>
                 </div>
-
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
                     <input type="file" accept=".csv" @change="handleFileSelect"
                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none" />
                 </div>
-
-                <!-- Import results -->
                 <div v-if="importResults" class="mb-4">
                     <div class="flex gap-4 mb-3 text-sm font-medium">
                         <span class="text-green-600">✓ {{ importResults.succeeded }} succeeded</span>
@@ -175,9 +190,7 @@
                         </div>
                     </div>
                 </div>
-
                 <div v-if="importError" class="mb-3 text-red-600 text-sm">{{ importError }}</div>
-
                 <div class="flex gap-3 justify-end">
                     <button @click="showImportModal = false; importResults = null; importError = null"
                         class="px-4 py-2 border rounded-lg hover:bg-gray-50">Close</button>
@@ -188,6 +201,7 @@
                 </div>
             </div>
         </div>
+    </div>
 </template>
 
 <script setup>
@@ -207,36 +221,13 @@ const loading    = ref(false)
 
 const showCreateModal = ref(false)
 const showImportModal = ref(false)
+const importFile      = ref(null)
+const importResults   = ref(null)
+const importError     = ref(null)
+const importing       = ref(false)
 
-const importFile    = ref(null)
-const importResults = ref(null)
-const importError   = ref(null)
-const importing     = ref(false)
-
-function handleFileSelect(event) {
-    importFile.value    = event.target.files[0]
-    importResults.value = null
-    importError.value   = null
-}
-
-async function submitImport() {
-    if (!importFile.value) return
-    importing.value = true
-    importError.value = null
-    try {
-        const formData = new FormData()
-        formData.append('file', importFile.value)
-        const response = await api.post('/devices/import', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-        importResults.value = response.data
-        await fetchDevices()
-    } catch (e) {
-        importError.value = e.response?.data?.message ?? 'Import failed.'
-    } finally {
-        importing.value = false
-    }
-}
+const selectedIds = ref([])
+const allSelected = ref(false)
 
 const filters = ref({
     search:      '',
@@ -264,6 +255,8 @@ async function fetchDevices() {
         const response = await api.get('/devices', { params })
         devices.value    = response.data.data
         pagination.value = response.data
+        selectedIds.value = []
+        allSelected.value = false
     } catch (e) {
         console.error('Failed to fetch devices', e)
     } finally {
@@ -285,6 +278,62 @@ async function fetchLookups() {
 function changePage(page) {
     filters.value.page = page
     fetchDevices()
+}
+
+function toggleAll() {
+    if (allSelected.value) {
+        selectedIds.value = devices.value.map(d => d.id)
+    } else {
+        selectedIds.value = []
+    }
+}
+
+async function printLabels(template = 'avery') {
+    if (selectedIds.value.length === 0) {
+        alert('Please select at least one device.')
+        return
+    }
+    try {
+        const ids      = selectedIds.value.join(',')
+        const response = await api.get('/labels', {
+            params:       { ids, template },
+            responseType: 'blob',
+        })
+        const url  = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+        const link = document.createElement('a')
+        link.href   = url
+        link.target = '_blank'
+        link.click()
+        URL.revokeObjectURL(url)
+    } catch (e) {
+        console.error('Failed to generate labels', e)
+        alert('Failed to generate labels. Please try again.')
+    }
+}
+
+function handleFileSelect(event) {
+    importFile.value    = event.target.files[0]
+    importResults.value = null
+    importError.value   = null
+}
+
+async function submitImport() {
+    if (!importFile.value) return
+    importing.value   = true
+    importError.value = null
+    try {
+        const formData = new FormData()
+        formData.append('file', importFile.value)
+        const response = await api.post('/devices/import', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        importResults.value = response.data
+        await fetchDevices()
+    } catch (e) {
+        importError.value = e.response?.data?.message ?? 'Import failed.'
+    } finally {
+        importing.value = false
+    }
 }
 
 function statusClass(name) {

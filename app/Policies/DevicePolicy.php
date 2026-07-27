@@ -70,9 +70,11 @@ class DevicePolicy
     /**
      * UC-11: Technician, Scheduler/Manager, Admin can generate/print asset labels.
      */
-    public function printLabel(User $user, Device $device): bool
+    public function printLabel(User $user): bool
     {
-        return $this->create($user);
+        return $user->canActAs(Role::TECHNICIAN)
+        || $user->canActAs(Role::SCHEDULER_MANAGER)
+        || $user->canActAs(Role::ADMIN);
     }
 
     /**

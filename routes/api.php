@@ -38,6 +38,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // -------------------------------------------------------------------------
     Route::get('/devices/import-template', [App\Http\Controllers\Api\DeviceImportController::class, 'template']);
     Route::post('/devices/import', [App\Http\Controllers\Api\DeviceImportController::class, 'import']);
+    // -------------------------------------------------------------------------
+    // Label Generation (UC-11)
+    // -------------------------------------------------------------------------
+    Route::get('/labels', [App\Http\Controllers\Api\LabelController::class, 'generate']);
 
     // Auth
     Route::post('/logout', [UserController::class, 'logout']);
