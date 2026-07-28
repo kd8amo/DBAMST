@@ -33,7 +33,32 @@ Route::post('/login',  [UserController::class, 'login']);
 // All routes below require a valid Sanctum token.
 Route::middleware('auth:sanctum')->group(function () {
 
-	// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+    // In-app Notifications (UC-31)
+    // -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+    // In-app Notifications (UC-31)
+    // -------------------------------------------------------------------------
+    Route::prefix('notifications')->group(function () {
+        Route::get('/', fn (Illuminate\Http\Request $request) => response()->json(
+            \App\Models\Notification::where('recipient_user_id', $request->user()->id)
+                ->orderByDesc('created_at')
+                ->limit(20)
+                ->get()
+        ));
+        Route::patch('/{notification}/read', function (Illuminate\Http\Request $request, \App\Models\Notification $notification) {
+            $notification->update(['is_read' => true, 'read_at' => now()]);
+            return response()->json($notification);
+        });
+        Route::post('/mark-all-read', function (Illuminate\Http\Request $request) {
+            \App\Models\Notification::where('recipient_user_id', $request->user()->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now()]);
+            return response()->json(['message' => 'All notifications marked as read.']);
+        });
+    });
+
+    // -------------------------------------------------------------------------
     // Device Import (UC-2)
     // -------------------------------------------------------------------------
     Route::get('/devices/import-template', [App\Http\Controllers\Api\DeviceImportController::class, 'template']);

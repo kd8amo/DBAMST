@@ -28,10 +28,49 @@
                 </button>
             </div>
         </aside>
+
         <main class="flex-1 flex flex-col overflow-hidden">
-            <header class="bg-white border-b px-6 py-3">
+            <!-- Top bar -->
+            <header class="bg-white border-b px-6 py-3 flex items-center justify-between">
                 <h2 class="text-gray-700 font-medium">{{ pageTitle }}</h2>
+
+                <!-- Notification bell -->
+                <div class="relative">
+                    <button @click="toggleNotifications"
+                        class="relative p-2 text-gray-500 hover:text-gray-700 transition-colors">
+                        🔔
+                        <span v-if="unreadCount > 0"
+                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {{ unreadCount > 9 ? '9+' : unreadCount }}
+                        </span>
+                    </button>
+
+                    <!-- Notification dropdown -->
+                    <div v-if="showNotifications"
+                        class="absolute right-0 top-10 w-96 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-y-auto">
+                        <div class="px-4 py-3 border-b flex items-center justify-between">
+                            <span class="font-semibold text-gray-700">Notifications</span>
+                            <button v-if="unreadCount > 0" @click="markAllRead"
+                                class="text-xs text-blue-600 hover:text-blue-800">Mark all read</button>
+                        </div>
+                        <div v-if="notifications.length === 0" class="p-4 text-sm text-gray-500 text-center">
+                            No notifications.
+                        </div>
+                        <ul v-else class="divide-y divide-gray-100">
+                            <li v-for="n in notifications" :key="n.id"
+                                :class="!n.is_read ? 'bg-blue-50' : ''"
+                                class="px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                                @click="markRead(n)">
+                                <p class="text-sm text-gray-800" :class="!n.is_read ? 'font-medium' : ''">
+                                    {{ n.message }}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">{{ formatDate(n.created_at) }}</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </header>
+
             <div class="flex-1 overflow-auto p-6">
                 <RouterView />
             </div>
@@ -40,13 +79,20 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth.js'
+import api from '../api.js'
 
 const route  = useRoute()
 const router = useRouter()
 const auth   = useAuthStore()
+
+const notifications    = ref([])
+const showNotifications = ref(false)
+
+const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length)
+const pageTitle   = computed(() => route.name ?? '')
 
 const navItems = [
     { name: 'dashboard',     to: '/',              label: 'nav.dashboard'    },
@@ -61,10 +107,64 @@ const navItems = [
     { name: 'sites',         to: '/sites',         label: 'nav.sites',       adminOnly: true },
 ].filter(item => !item.adminOnly || auth.isAdmin)
 
-const pageTitle = computed(() => route.name ?? '')
+async function fetchNotifications() {
+    try {
+        const response = await api.get('/notifications')
+        notifications.value = response.data
+    } catch (e) {
+        console.error('Failed to fetch notifications', e)
+    }
+}
+
+function toggleNotifications() {
+    showNotifications.value = !showNotifications.value
+    if (showNotifications.value) fetchNotifications()
+}
+
+async function markRead(notification) {
+    if (notification.is_read) return
+    try {
+        await api.patch(`/notifications/${notification.id}/read`)
+        notification.is_read = true
+    } catch (e) {
+        console.error('Failed to mark notification read', e)
+    }
+}
+
+async function markAllRead() {
+    try {
+        await api.post('/notifications/mark-all-read')
+        notifications.value.forEach(n => n.is_read = true)
+    } catch (e) {
+        console.error('Failed to mark all read', e)
+    }
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return ''
+    return new Date(dateStr).toLocaleString()
+}
+
+// Close dropdown when clicking outside
+function handleClickOutside(e) {
+    if (!e.target.closest('.relative')) {
+        showNotifications.value = false
+    }
+}
 
 async function handleLogout() {
     await auth.logout()
     router.push({ name: 'login' })
 }
+
+onMounted(() => {
+    fetchNotifications()
+    document.addEventListener('click', handleClickOutside)
+    // Poll for new notifications every 60 seconds
+    const interval = setInterval(fetchNotifications, 60000)
+    onUnmounted(() => {
+        clearInterval(interval)
+        document.removeEventListener('click', handleClickOutside)
+    })
+})
 </script>
