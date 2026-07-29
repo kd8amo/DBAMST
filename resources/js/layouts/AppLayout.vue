@@ -102,6 +102,7 @@ const navItems = [
     { name: 'fault-reports', to: '/fault-reports', label: 'nav.faultReports' },
     { name: 'maintenance',   to: '/maintenance',   label: 'nav.maintenance'  },
     { name: 'audit-log',     to: '/audit-log',     label: 'nav.auditLog'     },
+    { name: 'reports', to: '/reports', label: 'nav.reports' },
     { name: 'users',         to: '/users',         label: 'nav.users',       adminOnly: true },
     { name: 'api-keys',      to: '/api-keys',      label: 'nav.apiKeys',     adminOnly: true },
     { name: 'sites',         to: '/sites',         label: 'nav.sites',       adminOnly: true },

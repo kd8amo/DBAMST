@@ -11,35 +11,32 @@ use App\Http\Controllers\Api\TestSystemController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| All routes here are prefixed with /api and protected by Sanctum auth
-| unless explicitly marked as public. Route model binding is active —
-| {device}, {site}, {testSystem} etc. resolve automatically via Eloquent.
-|
-*/
+	/*
+	|--------------------------------------------------------------------------
+	| API Routes
+	|--------------------------------------------------------------------------
+	|
+	| All routes here are prefixed with /api and protected by Sanctum auth
+	| unless explicitly marked as public. Route model binding is active —
+	| {device}, {site}, {testSystem} etc. resolve automatically via Eloquent.
+	|
+	*/
 
-// Health check — unauthenticated, used by monitoring/load balancers.
-Route::get('/health', fn () => response()->json(['status' => 'ok']));
+	// Health check — unauthenticated, used by monitoring/load balancers.
+	Route::get('/health', fn () => response()->json(['status' => 'ok']));
 
-Route::middleware('auth:sanctum')->get('/dashboard', [App\Http\Controllers\Api\DashboardController::class, 'summary']);
+	Route::middleware('auth:sanctum')->get('/dashboard', [App\Http\Controllers\Api\DashboardController::class, 'summary']);
 
-// Authentication — unauthenticated.
-Route::post('/login',  [UserController::class, 'login']);
+	// Authentication — unauthenticated.
+	Route::post('/login',  [UserController::class, 'login']);
 
-// All routes below require a valid Sanctum token.
-Route::middleware('auth:sanctum')->group(function () {
+	// All routes below require a valid Sanctum token.
+	Route::middleware('auth:sanctum')->group(function () {
 
-// -------------------------------------------------------------------------
-    // In-app Notifications (UC-31)
-    // -------------------------------------------------------------------------
-// -------------------------------------------------------------------------
-    // In-app Notifications (UC-31)
-    // -------------------------------------------------------------------------
-    Route::prefix('notifications')->group(function () {
+	// -------------------------------------------------------------------------
+	// In-app Notifications (UC-31)
+	// -------------------------------------------------------------------------
+	Route::prefix('notifications')->group(function () {
         Route::get('/', fn (Illuminate\Http\Request $request) => response()->json(
             \App\Models\Notification::where('recipient_user_id', $request->user()->id)
                 ->orderByDesc('created_at')
@@ -56,6 +53,13 @@ Route::middleware('auth:sanctum')->group(function () {
                 ->update(['is_read' => true, 'read_at' => now()]);
             return response()->json(['message' => 'All notifications marked as read.']);
         });
+    });
+    // -------------------------------------------------------------------------
+    // Reports (UC-26/27)
+    // -------------------------------------------------------------------------
+    Route::prefix('reports')->group(function () {
+        Route::get('/', [App\Http\Controllers\Api\ReportController::class, 'index']);
+        Route::get('/{reportId}', [App\Http\Controllers\Api\ReportController::class, 'generate']);
     });
 
     // -------------------------------------------------------------------------

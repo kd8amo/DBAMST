@@ -15,6 +15,7 @@ export default {
         apiKeys:      'API Keys',
         sites:        'Sites',
         logout:       'Logout',
+	reports: 'Reports',
     },
     auth: {
         login:           'Login',
